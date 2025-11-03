@@ -1,0 +1,28 @@
+import re
+import pandas as pd
+from pyspark.sql.functions import split, col, regexp_replace, try_element_at
+from pyspark.sql.functions import split, col, regexp_replace, try_element_at
+
+# Read the Delta table into a Spark DataFrame
+df = spark.table("dev_th.tests.sagarin_test")
+
+# Delimit the first column where there are more than 10 spaces in a row
+first_col_name = df.columns[0]
+df = df.withColumn(first_col_name, regexp_replace(first_col_name, r'@', ''))
+df = df.withColumn(first_col_name, regexp_replace(first_col_name, r'\s{2,}', ','))
+
+# # Split the first column into multiple columns using try_element_at to handle out-of-bounds indices
+# split_col = split(col(first_col_name), ',')
+# df = df.withColumn("Favorite", try_element_at(split_col, 1)) \
+#        .withColumn("Rating", try_element_at(split_col, 2)) \
+#        .withColumn("Predict", try_element_at(split_col, 3)) \
+#        .withColumn("Golden", try_element_at(split_col, 4)) \
+#        .withColumn("Recent", try_element_at(split_col, 5)) \
+#        .withColumn("Recent2", try_element_at(split_col, 6)) \
+#        .withColumn("Underdog", try_element_at(split_col, 7)) \
+#        .withColumn("Odds", try_element_at(split_col, 8)) \
+#        .withColumn("Pct%", try_element_at(split_col, 9)) \
+#        .withColumn("Total", try_element_at(split_col, 10))
+
+display(df)
+
