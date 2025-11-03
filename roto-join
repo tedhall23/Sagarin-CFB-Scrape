@@ -1,0 +1,54 @@
+%sql
+WITH base AS (
+  SELECT 
+    s.FAVORITE, 
+    s.Rating, 
+    s.Pred, 
+    s.Golden, 
+    s.Recent, 
+    s.UNDERDOG,
+    r.team,
+    r.spread,
+    round((s.Rating + s.Pred + s.Golden) / 3, 1) as avg_rating
+  FROM dev_th.tests.sagarin_cleaner_10_28 s
+  LEFT JOIN (
+    SELECT Spread, Team 
+    FROM dev_th.tests.cfb_odds_rotowire_26
+  ) r ON s.FAVORITE = r.Team
+),
+calc AS (
+  SELECT
+    FAVORITE,
+    Rating,
+    Pred,
+    Golden,
+    Recent,
+    UNDERDOG,
+    team,
+    spread,
+    avg_rating,
+    CASE 
+      WHEN Recent < 0 THEN round((avg_rating + Recent),1)
+      WHEN Recent > 0 THEN round((Recent - avg_rating),1)
+      ELSE NULL
+    END as MOM,
+    round((avg_rating + spread),1) as DIFF
+  FROM base
+)
+SELECT
+  FAVORITE,
+  Rating,
+  Pred,
+  Golden,
+  Recent,
+  UNDERDOG,
+  team,
+  spread,
+  avg_rating,
+  MOM,
+  DIFF,
+  round(DIFF + MOM, 1) as mDIFF
+FROM calc
+-- WHERE 
+--   abs(DIFF) >= 2
+--   AND abs(DIFF + MOM) >= 2
