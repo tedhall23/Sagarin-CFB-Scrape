@@ -49,6 +49,6 @@ SELECT
   DIFF,
   round(DIFF + MOM, 1) as mDIFF
 FROM calc
--- WHERE 
---   abs(DIFF) >= 2
---   AND abs(DIFF + MOM) >= 2
+WHERE 
+abs(DIFF) >= 2
+AND abs(DIFF + MOM) >= 2
